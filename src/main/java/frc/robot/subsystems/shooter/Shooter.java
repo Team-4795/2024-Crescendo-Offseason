@@ -23,4 +23,9 @@ public class Shooter extends SubsystemBase {
     io = shooterIO;
     io.updateInputs(inputs);
   }
+
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+  }
 }
