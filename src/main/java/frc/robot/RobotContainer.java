@@ -61,13 +61,20 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
+        drive = Drive.initialize(
+                new GyroIOPigeon2(), 
                 new ModuleIOSparkMax(0),
                 new ModuleIOSparkMax(1),
                 new ModuleIOSparkMax(2),
                 new ModuleIOSparkMax(3));
+                
+            // new Drive(
+            //     new GyroIOPigeon2(),
+            //     new ModuleIOSparkMax(0),
+            //     new ModuleIOSparkMax(1),
+            //     new ModuleIOSparkMax(2),
+            //     new ModuleIOSparkMax(3));
+
         flywheel = new Flywheel(new FlywheelIOSparkMax());
         // drive = new Drive(
         // new GyroIOPigeon2(),
@@ -151,7 +158,7 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    
+
     controller
         .b()
         .onTrue(
