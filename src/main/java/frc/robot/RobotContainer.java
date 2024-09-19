@@ -15,8 +15,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -61,19 +59,20 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive = Drive.initialize(
-                new GyroIOPigeon2(), 
+        drive =
+            Drive.initialize(
+                new GyroIOPigeon2(),
                 new ModuleIOSparkMax(0),
                 new ModuleIOSparkMax(1),
                 new ModuleIOSparkMax(2),
                 new ModuleIOSparkMax(3));
-                
-            // new Drive(
-            //     new GyroIOPigeon2(),
-            //     new ModuleIOSparkMax(0),
-            //     new ModuleIOSparkMax(1),
-            //     new ModuleIOSparkMax(2),
-            //     new ModuleIOSparkMax(3));
+
+        // new Drive(
+        //     new GyroIOPigeon2(),
+        //     new ModuleIOSparkMax(0),
+        //     new ModuleIOSparkMax(1),
+        //     new ModuleIOSparkMax(2),
+        //     new ModuleIOSparkMax(3));
 
         flywheel = new Flywheel(new FlywheelIOSparkMax());
         // drive = new Drive(
@@ -129,16 +128,19 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Flywheel SysId (Quasistatic Forward)",
-        flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Flywheel SysId (Quasistatic Reverse)",
-        flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Flywheel SysId (Dynamic Forward)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    // autoChooser.addOption(
+    //     "Flywheel SysId (Quasistatic Forward)",
+    //     flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Flywheel SysId (Quasistatic Reverse)",
+    //     flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Flywheel SysId (Dynamic Forward)",
+    // flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Flywheel SysId (Dynamic Reverse)",
+    // flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -157,24 +159,33 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+    controller.leftBumper().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+
+    controller.leftTrigger().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+
+    controller.rightBumper().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+
+    controller.rightTrigger().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    // controller
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+    //                 drive)
+    //             .ignoringDisable(true));
     // controller
     //     .a()
     //     .whileTrue(
     //         Commands.startEnd(
     //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
 
-    controller.a().whileTrue(Commands.runOnce(() -> drive.zeroHeading(), drive));
+    // controller.a().whileTrue(Commands.runOnce(() -> drive.zeroHeading(), drive));
   }
 
   /**

@@ -30,6 +30,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,8 +56,13 @@ public class Drive extends SubsystemBase {
 
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
+  private final MutableMeasure<Voltage> m_appliedVoltage = MutableMeasure.ofBaseUnits(0, Volts);
+  private final MutableMeasure<Angle> m_position = MutableMeasure.ofBaseUnits(0, Radians);
+  private final MutableMeasure<Velocity<Angle>> m_velocity =
+      MutableMeasure.ofBaseUnits(0, RadiansPerSecond);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -117,18 +126,19 @@ public class Drive extends SubsystemBase {
     // Configure SysId
     sysId =
         new SysIdRoutine(
-            new SysIdRoutine.Config(
-                null,
-                null,
-                null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+            new SysIdRoutine.Config(),
             new SysIdRoutine.Mechanism(
                 (voltage) -> {
                   for (int i = 0; i < 4; i++) {
                     modules[i].runCharacterization(voltage.in(Volts));
                   }
                 },
-                null,
+                log -> {
+                  log.motor("driveSparkMax")
+                      .voltage(m_appliedVoltage.mut_replace(inputs.driveAppliedVolts, Volts))
+                      .angularPosition(m_position.mut_replace(inputs.drivePositionRad, Radians))
+                      .angularVelocity(m_velocity.mut_replace(inputs.driveVelocityRadPerSec, RadiansPerSecond));
+                },
                 this));
   }
 
