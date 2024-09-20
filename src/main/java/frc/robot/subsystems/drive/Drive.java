@@ -61,8 +61,7 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
   private final MutableMeasure<Voltage> m_appliedVoltage = MutableMeasure.ofBaseUnits(0, Volts);
   private final MutableMeasure<Angle> m_position = MutableMeasure.ofBaseUnits(0, Radians);
-  private final MutableMeasure<Velocity<Angle>> m_velocity =
-      MutableMeasure.ofBaseUnits(0, RadiansPerSecond);
+  private final MutableMeasure<Velocity<Angle>> m_velocity = MutableMeasure.ofBaseUnits(0, RadiansPerSecond);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();

@@ -22,6 +22,8 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix.sensors.Pigeon2;
+
 public class Module {
   private static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
 
@@ -44,6 +46,10 @@ public class Module {
     // separate robot with different tuning)
     switch (Constants.currentMode) {
       case REAL:
+        driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
+        driveFeedback = new PIDController(0.05, 0.0, 0.0);
+        turnFeedback = new PIDController(7.0, 0.0, 0.0);
+        break;
       case REPLAY:
         driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
         driveFeedback = new PIDController(0.05, 0.0, 0.0);
@@ -95,6 +101,8 @@ public class Module {
         io.setDriveVoltage(
             driveFeedforward.calculate(velocityRadPerSec)
                 + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
+
+         // If Talon use:   io.runTalonPID(Units.radiansToRotations(velocityRadPerSec));
       }
     }
   }
