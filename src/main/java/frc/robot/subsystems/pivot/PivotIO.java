@@ -7,8 +7,8 @@ public interface PivotIO {
     @AutoLog
   public static class PivotIOInputs {
     public double positionRad = 0.0;
-    public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
+    public double velocityRevolutionsPerSec = 0.0;
     public double[] currentAmps = new double[] {};
   }
 
@@ -19,7 +19,7 @@ public interface PivotIO {
   public default void setVoltage(double volts) {}
 
   /** Run closed loop at the specified velocity. */
-  public default void setVelocity(double velocityRadPerSec, double ffVolts) {}
+  public default void setAngle(double positionRad) {}
 
   /** Stop in open loop. */
   public default void stop() {}

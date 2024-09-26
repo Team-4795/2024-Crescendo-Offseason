@@ -4,7 +4,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.subsystems.flywheel.FlywheelIO.FlywheelIOInputs;
 
 public class PivotIOSim implements PivotIO {
     private SingleJointedArmSim sim = new SingleJointedArmSim(DCMotor.getNEO(1), 1.5, 
@@ -19,16 +18,15 @@ public class PivotIOSim implements PivotIO {
       @Override
     public void updateInputs(PivotIOInputs inputs) {
         if (closedLoop) {
-        appliedVolts =
-            MathUtil.clamp(pid.calculate(sim.getVelocityRadPerSec()) + ffVolts, -12.0, 12.0);
+        appliedVolts = 
+            MathUtil.clamp(pid.calculate(sim.getAngleRads()) + ffVolts, -12.0, 12.0);
             sim.setInputVoltage(appliedVolts);
         }
     }
 
     @Override
-    public void rotatePivot(double speed) {
-        pivotAppliedVolts = MathUtil.clamp(12 * speed, -12, 12);
-        sim.setInputVoltage(appliedVolts);
+    public void setAngle(double targetAngle) {
+        pid.setSetpoint(targetAngle);
     }
 
     @Override

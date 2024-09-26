@@ -13,10 +13,12 @@ public class Pivot extends SubsystemBase {
     public final PivotIO io;
     private final SimpleMotorFeedforward ffModel;
     private final PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
+    private double goalRad;
 
     private Pivot(PivotIO io) {
         
         this.io = io;
+        goalRad = 0;
 
         switch (Constants.currentMode) {
             case REAL:
@@ -55,6 +57,10 @@ public class Pivot extends SubsystemBase {
 
     public void runVoltage(double volts) {
         io.setVoltage(volts);
+    }
+
+    public void setGoal() {
+        
     }
 
     public void stop() {
