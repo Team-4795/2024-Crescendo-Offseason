@@ -22,7 +22,6 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -40,7 +39,7 @@ import edu.wpi.first.math.util.Units;
  * "/Drive/ModuleX/TurnAbsolutePositionRad"
  */
 public class ModuleIOTalonFX implements ModuleIO {
-final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
+  final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
   // Gear ratios for SDS MK4i L2, adjust as necessary
   private static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   private static final double TURN_GEAR_RATIO = 150.0 / 7.0;
@@ -83,7 +82,7 @@ final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
       default:
         throw new RuntimeException("Invalid module index");
     }
-    
+
     turnSparkMax.restoreFactoryDefaults();
 
     turnAbsoluteEncoder.setPositionConversionFactor(2 * Math.PI); // Radians
@@ -114,18 +113,18 @@ final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
     driveTalonFX.clearStickyFaults();
 
     StatusCode status = StatusCode.StatusCodeNotInitialized;
-        for (int i = 0; i < 5; i++) {
-            status = driveTalonFX.getConfigurator().apply(config);
-            if (status.isOK()) break;
-        }
+    for (int i = 0; i < 5; i++) {
+      status = driveTalonFX.getConfigurator().apply(config);
+      if (status.isOK()) break;
+    }
 
-        if (!status.isOK()) {
-            System.out.println(
-                    "Talon ID "
-                            + driveTalonFX.getDeviceID()
-                            + " failed config with error "
-                            + status.toString());
-        }
+    if (!status.isOK()) {
+      System.out.println(
+          "Talon ID "
+              + driveTalonFX.getDeviceID()
+              + " failed config with error "
+              + status.toString());
+    }
   }
 
   @Override
@@ -133,7 +132,8 @@ final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
     inputs.drivePositionRad =
         Units.rotationsToRadians(driveTalonFX.getPosition().getValueAsDouble()) / DRIVE_GEAR_RATIO;
     inputs.driveVelocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(driveTalonFX.getVelocity().getValueAsDouble()) / DRIVE_GEAR_RATIO;
+        Units.rotationsPerMinuteToRadiansPerSecond(driveTalonFX.getVelocity().getValueAsDouble())
+            / DRIVE_GEAR_RATIO;
     inputs.driveAppliedVolts = driveTalonFX.getMotorVoltage().getValueAsDouble();
     inputs.driveCurrentAmps = new double[] {driveTalonFX.getSupplyCurrent().getValueAsDouble()};
 
@@ -146,25 +146,25 @@ final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
     inputs.turnAppliedVolts = turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage();
     inputs.turnCurrentAmps = new double[] {turnSparkMax.getOutputCurrent()};
   }
-  
+
   private TalonFXConfiguration config() {
-        var talonFXConfig = new TalonFXConfiguration();
+    var talonFXConfig = new TalonFXConfiguration();
 
-        talonFXConfig.Slot0.kP = 1;
-        talonFXConfig.Slot0.kI = 0;
-        talonFXConfig.Slot0.kD = 0;
-        talonFXConfig.Slot0.kS = 0;
-        talonFXConfig.Slot0.kV = 0;
+    talonFXConfig.Slot0.kP = 1;
+    talonFXConfig.Slot0.kI = 0;
+    talonFXConfig.Slot0.kD = 0;
+    talonFXConfig.Slot0.kS = 0;
+    talonFXConfig.Slot0.kV = 0;
 
-        talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonFXConfig.CurrentLimits.StatorCurrentLimit = 40; //CurrentLimits.drive;
+    talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    talonFXConfig.CurrentLimits.StatorCurrentLimit = 40; // CurrentLimits.drive;
 
-        talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        talonFXConfig.Audio.BeepOnBoot = true;
+    talonFXConfig.Audio.BeepOnBoot = true;
 
-        return talonFXConfig;
-    }
+    return talonFXConfig;
+  }
 
   @Override
   public void setDriveVoltage(double volts) {
@@ -181,10 +181,10 @@ final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
     turnSparkMax.setVoltage(volts);
   }
 
-//   @Override
-//   public void setDriveBrakeMode(boolean enable) {
-//     driveTalonFX.setBrakeMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
-//   }
+  //   @Override
+  //   public void setDriveBrakeMode(boolean enable) {
+  //     driveTalonFX.setBrakeMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+  //   }
 
   @Override
   public void setTurnBrakeMode(boolean enable) {

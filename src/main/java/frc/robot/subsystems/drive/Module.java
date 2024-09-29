@@ -22,8 +22,6 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.sensors.Pigeon2;
-
 public class Module {
   private static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
 
@@ -102,7 +100,7 @@ public class Module {
             driveFeedforward.calculate(velocityRadPerSec)
                 + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
 
-         // If Talon use:   io.runTalonPID(Units.radiansToRotations(velocityRadPerSec));
+        // If Talon use:   io.runTalonPID(Units.radiansToRotations(velocityRadPerSec));
       }
     }
   }
