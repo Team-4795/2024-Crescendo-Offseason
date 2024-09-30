@@ -175,11 +175,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
-    controller
-        .y()
-        .whileTrue(
-            Commands.startEnd(
-                () -> pivot.setVelocity(, pivot::stop, pivot)));
+                
   }
 
   /**

@@ -18,7 +18,7 @@ public class Pivot extends SubsystemBase {
     private Pivot(PivotIO io) {
         
         this.io = io;
-        goalRad = 0;
+        goalRad = 0.0;
 
         switch (Constants.currentMode) {
             case REAL:
@@ -59,8 +59,8 @@ public class Pivot extends SubsystemBase {
         io.setVoltage(volts);
     }
 
-    public void setGoal() {
-        
+    public void setGoal(double goal) {
+        goalRad = goal;
     }
 
     public void stop() {

@@ -1,38 +1,65 @@
-// package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.pivot;
 
-// import edu.wpi.first.math.MathUtil;
-// import edu.wpi.first.math.controller.PIDController;
-// import edu.wpi.first.math.system.plant.DCMotor;
-// import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-// import frc.robot.subsystems.flywheel.FlywheelIO.FlywheelIOInputs;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
-// public class PivotIOReal implements PivotIO {
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+
+public class PivotIOReal implements PivotIO {
+    private CANSparkFlex pivotLeft = new CANSparkFlex(0, MotorType.kBrushless);
+    private CANSparkFlex pivotRight = new CANSparkFlex(1, MotorType.kBrushless);
+    private RelativeEncoder pivotEncoderRight = pivotRight.getEncoder();
+    private PIDController pid = new PIDController(1.0, 0.0, 0.0);
+
+    private boolean closedLoop = false;
+    private double ffVolts = 0.0;
+    private double appliedVolts = 0.0;
     
-    
-    
+    public PivotIOReal() {
+        pivotLeft.restoreFactoryDefaults();
+        pivotRight.restoreFactoryDefaults();
+        
+        pivotLeft.follow(pivotRight);
+        pivotLeft.setInverted(true);
 
-//     @Override
-//   public void setVoltage(double volts) {
-//     closedLoop = false;
-//     appliedVolts = volts;
-//     sim.setInputVoltage(volts);
-//   }
+        pivotLeft.setCANTimeout(250);
+        pivotRight.setCANTimeout(250);
+        pivotLeft.enableVoltageCompensation(12);
+        pivotRight.enableVoltageCompensation(12);
+        pivotLeft.setSmartCurrentLimit(80);
+        pivotRight.setSmartCurrentLimit(80);
+        pivotLeft.setIdleMode(IdleMode.kBrake);
+        pivotRight.setIdleMode(IdleMode.kBrake);
+        
+        pivotLeft.burnFlash();
+        pivotRight.burnFlash();
+    }
 
-//   @Override
-//   public void setVelocity(double velocityRadPerSec, double ffVolts) {
-//     closedLoop = true;
-//     pid.setSetpoint(velocityRadPerSec);
-//     this.ffVolts = ffVolts;
-//   }
+    @Override
+    public void updateInputs(PivotIOInputs inputs) {
+        inputs.positionRad = pivotEncoderRight.getPosition() * 2 * Math.PI;
+        inputs.velocityRevolutionsPerSec = pivotEncoderRight.getVelocity();
+        inputs.appliedVolts = appliedVolts;
+        
+        if (closedLoop) {
+        appliedVolts = 
+            MathUtil.clamp(pid.calculate(inputs.positionRad) + ffVolts, -12.0, 12.0);
+        }
+    }
 
-//   @Override
-//   public void stop() {
-//     setVoltage(0.0);
-//   }
+    @Override
+    public void setAngle(double targetAngle) {
+        pid.setSetpoint(targetAngle);
+    }
 
-//   @Override
-//   public void configurePID(double kP, double kI, double kD) {
-//     pid.setPID(kP, kI, kD);
-//   }
+    @Override
+    public void setVoltage(double volts) {
+        appliedVolts = MathUtil.clamp(volts, -12, 12);
+        pivotRight.setVoltage(appliedVolts);
+    }
 
-// }
+
+}
