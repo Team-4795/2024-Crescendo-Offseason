@@ -17,6 +17,9 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
-    public void updateInputs(IntakeIOInputs inputs) {}
+    public void updateInputs(IntakeIOInputs inputs) {
+        inputs.Voltage = IntakeMotor.getBusVoltage();
+        inputs.Amps = IntakeMotor.getOutputCurrent();
+    }
 
 }
