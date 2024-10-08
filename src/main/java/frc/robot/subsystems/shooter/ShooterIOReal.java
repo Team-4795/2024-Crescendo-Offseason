@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -9,14 +10,21 @@ public class ShooterIOReal implements ShooterIO {
       new CANSparkFlex(0, MotorType.kBrushless); // Can IDs not accurate
   private CANSparkFlex rightShooterMotor =
       new CANSparkFlex(1, MotorType.kBrushless); // Can IDsp not accurate
+
   private RelativeEncoder leftShooterEncoder = leftShooterMotor.getEncoder();
   private RelativeEncoder rightShooterEncoder = rightShooterMotor.getEncoder();
 
   public ShooterIOReal() {
+    rightShooterMotor.restoreFactoryDefaults();
+    leftShooterMotor.restoreFactoryDefaults();
+
     rightShooterMotor.follow(leftShooterMotor, true);
-   
+
     leftShooterMotor.setSmartCurrentLimit(40);
     rightShooterMotor.setSmartCurrentLimit(40);
+
+    rightShooterMotor.setIdleMode(IdleMode.kCoast);
+    leftShooterMotor.setIdleMode(IdleMode.kCoast);
 
     rightShooterMotor.burnFlash();
     leftShooterMotor.burnFlash();
@@ -50,25 +58,24 @@ public class ShooterIOReal implements ShooterIO {
   }
 
   public double getRightVoltage() {
-      return rightShooterMotor.getBusVoltage();
+    return rightShooterMotor.getBusVoltage();
   }
 
   public double getLeftCurrent() {
-      return leftShooterMotor.getOutputCurrent();
+    return leftShooterMotor.getOutputCurrent();
   }
 
   public double getRightCurrent() {
-      return rightShooterMotor.getOutputCurrent();
+    return rightShooterMotor.getOutputCurrent();
   }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
     inputs.leftMotorVelocity = getLeftvelocity();
     inputs.rightMotorVelocity = getRightvelocity();
-    inputs.leftAppliedVolts = getLeftVoltage(); 
+    inputs.leftAppliedVolts = getLeftVoltage();
     inputs.rightAppliedVolts = getRightVoltage();
-    inputs.leftOutputCurrent = getLeftCurrent(); 
+    inputs.leftOutputCurrent = getLeftCurrent();
     inputs.rightOutputCurrent = getRightCurrent();
   }
 }
-
