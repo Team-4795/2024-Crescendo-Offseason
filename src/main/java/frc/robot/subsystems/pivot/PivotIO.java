@@ -3,8 +3,8 @@ package frc.robot.subsystems.pivot;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface PivotIO {
-    
-    @AutoLog
+
+  @AutoLog
   public static class PivotIOInputs {
     public double positionRad = 0.0;
     public double appliedVolts = 0.0;
@@ -26,5 +26,4 @@ public interface PivotIO {
 
   /** Set velocity PID constants. */
   public default void configurePID(double kP, double kI, double kD) {}
-
 }
