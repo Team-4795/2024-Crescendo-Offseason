@@ -14,7 +14,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -103,8 +102,7 @@ public class RobotContainer {
         break;
     }
 
-
-    //This can go away
+    // This can go away
 
     // Set up auto routines
     // NamedCommands.registerCommand(
@@ -154,7 +152,9 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller.y().onTrue(Commands.runEnd(() -> pivot.setGoal(45), () -> pivot.setGoal(0)));
+    controller
+        .y()
+        .whileTrue(Commands.runEnd(() -> pivot.setGoal(Math.PI / 4), () -> pivot.setGoal(0), pivot));
   }
 
   /**

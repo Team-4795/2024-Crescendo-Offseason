@@ -8,7 +8,7 @@ public interface PivotIO {
   public static class PivotIOInputs {
     public double positionRad = 0.0;
     public double appliedVolts = 0.0;
-    public double velocityRevolutionsPerSec = 0.0;
+    public double velocityRadPerSec = 0.0;
     public double[] currentAmps = new double[] {};
   }
 

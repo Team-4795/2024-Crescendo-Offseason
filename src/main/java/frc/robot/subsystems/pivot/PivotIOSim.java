@@ -7,19 +7,23 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class PivotIOSim implements PivotIO {
   private SingleJointedArmSim sim =
-      new SingleJointedArmSim(DCMotor.getNEO(1), 1.5, 0.004, 0, 0, 0, false, 0);
-  private PIDController pid = new PIDController(1.0, 0.0, 0.0);
+      new SingleJointedArmSim(DCMotor.getNEO(1), 1.5, 0.004, 0.2, 0, Math.PI, false, 0);
+  private PIDController pid = new PIDController(0.2, 0.0, 0.0);
 
-  private boolean closedLoop = false;
+  private boolean closedLoop = true;
   private double ffVolts = 0.0;
   private double appliedVolts = 0.0;
 
   @Override
   public void updateInputs(PivotIOInputs inputs) {
-    if (closedLoop) {
-      appliedVolts = MathUtil.clamp(pid.calculate(sim.getAngleRads()) + ffVolts, -12.0, 12.0);
-      sim.setInputVoltage(appliedVolts);
-    }
+    sim.update(0.02);
+
+    appliedVolts = MathUtil.clamp(pid.calculate(sim.getAngleRads()) + ffVolts, -12.0, 12.0);
+    sim.setInputVoltage(appliedVolts);
+    
+    inputs.positionRad = sim.getAngleRads();
+    inputs.appliedVolts = appliedVolts;
+    inputs.velocityRadPerSec = sim.getVelocityRadPerSec();
   }
 
   @Override

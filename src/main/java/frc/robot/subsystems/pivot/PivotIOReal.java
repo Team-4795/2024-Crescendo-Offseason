@@ -40,7 +40,7 @@ public class PivotIOReal implements PivotIO {
   @Override
   public void updateInputs(PivotIOInputs inputs) {
     inputs.positionRad = pivotEncoderRight.getPosition() * 2 * Math.PI;
-    inputs.velocityRevolutionsPerSec = pivotEncoderRight.getVelocity();
+    inputs.velocityRadPerSec = pivotEncoderRight.getVelocity() * 2 * Math.PI / 60;
     inputs.appliedVolts = appliedVolts;
 
     if (closedLoop) {

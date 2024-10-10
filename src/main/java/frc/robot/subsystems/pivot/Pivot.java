@@ -39,7 +39,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public static Pivot initialize(PivotIO io) {
-    if (Pivot.pivotInstance == null) {
+    if (Pivot.pivotInstance == null) { 
       pivotInstance = new Pivot(io);
     }
     return pivotInstance;
@@ -48,6 +48,7 @@ public class Pivot extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    io.setVoltage(inputs.appliedVolts);
     Logger.processInputs("Pivot", inputs);
   }
 
@@ -56,7 +57,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public void setGoal(double goal) {
-    goalRad = goal;
+    io.setAngle(goal);
   }
 
   public void stop() {
