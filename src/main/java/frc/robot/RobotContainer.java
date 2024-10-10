@@ -34,6 +34,9 @@ import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOReal;
+import frc.robot.subsystems.intake.IntakeIOSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -69,6 +72,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(2),
                 new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
+        Intake.initialize(new IntakeIOReal());
         // drive = new Drive(
         // new GyroIOPigeon2(),
         // new ModuleIOTalonFX(0),
@@ -88,6 +92,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
+        Intake.initialize(new IntakeIOSim());
+
         break;
 
       default:
@@ -165,6 +171,8 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
+    controller.leftTrigger().whileTrue(Intake.getInstance().intake());
+    // controller.rightTrigger().whileTrue(Intake.getInstance().spike());
   }
 
   /**

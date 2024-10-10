@@ -8,9 +8,12 @@ public class IntakeIOSim implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    motor.update(0.01);
+    motor.update(0.02);
 
+    inputs.angularPositionRot = motor.getAngularPositionRotations();
+    inputs.angularVelocityRPM = motor.getAngularVelocityRPM();
     inputs.Amps = motor.getCurrentDrawAmps();
+    inputs.noteTime = Intake.time1;
   }
 
   @Override
