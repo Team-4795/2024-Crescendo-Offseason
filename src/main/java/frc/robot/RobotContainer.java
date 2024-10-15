@@ -172,7 +172,7 @@ public class RobotContainer {
             Commands.startEnd(
                 () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
     controller.leftTrigger().whileTrue(Intake.getInstance().intake());
-    // controller.rightTrigger().whileTrue(Intake.getInstance().spike());
+    controller.rightTrigger().whileTrue(Intake.getInstance().spike());
   }
 
   /**

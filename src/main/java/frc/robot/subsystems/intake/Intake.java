@@ -50,20 +50,20 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intake() {
-    return startEnd(() -> setIntakeSpeed(1), () -> setIntakeSpeed(0))
+    return startEnd(() -> setIntakeSpeed(IntakeConstants.forward), () -> setIntakeSpeed(0))
         .onlyWhile(() -> noteNotInIntake());
     // return (startEnd(() -> setIntakeSpeed(1), () -> setIntakeSpeed(0)).onlyWhile(() ->
     // noteNotInIntake())).alongWith(startEnd(() -> setIntakeSpeed(0.1), () ->
     // setIntakeSpeed(0)).onlyIf(() -> noteNotInIntake() == true).onlyWhile(() -> noteNotInIntake()
     // == true));
   }
-/*
+
   public Command spike() {
     return startEnd(() -> testamps = 150, () -> testamps = 0);
   }
-*/
+
   public Command reverse() {
-    return startEnd(() -> setIntakeSpeed(-1), () -> setIntakeSpeed(0));
+    return startEnd(() -> setIntakeSpeed(IntakeConstants.reverse), () -> setIntakeSpeed(0));
   }
 
   @Override

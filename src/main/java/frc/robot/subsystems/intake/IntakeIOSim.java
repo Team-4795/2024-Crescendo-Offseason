@@ -4,7 +4,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class IntakeIOSim implements IntakeIO {
-  private final DCMotorSim motor = new DCMotorSim(DCMotor.getNeoVortex(1), 1, 1);
+  private final DCMotorSim motor = new DCMotorSim(DCMotor.getNeoVortex(1), 30, 0.003);
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
