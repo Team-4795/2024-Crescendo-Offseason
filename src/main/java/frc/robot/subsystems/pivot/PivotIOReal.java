@@ -42,6 +42,7 @@ public class PivotIOReal implements PivotIO {
     inputs.positionRad = pivotEncoderRight.getPosition() * 2 * Math.PI;
     inputs.velocityRadPerSec = pivotEncoderRight.getVelocity() * 2 * Math.PI / 60;
     inputs.appliedVolts = appliedVolts;
+    inputs.goalAngle = pid.getSetpoint();
 
     if (closedLoop) {
       appliedVolts = MathUtil.clamp(pid.calculate(inputs.positionRad) + ffVolts, -12.0, 12.0);
