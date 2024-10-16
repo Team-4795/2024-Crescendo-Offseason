@@ -57,11 +57,11 @@ public class Intake extends SubsystemBase {
     // setIntakeSpeed(0)).onlyIf(() -> noteNotInIntake() == true).onlyWhile(() -> noteNotInIntake()
     // == true));
   }
-/*
-  public Command spike() {
-    return startEnd(() -> testamps = 150, () -> testamps = 0);
-  }
-*/
+  /*
+    public Command spike() {
+      return startEnd(() -> testamps = 150, () -> testamps = 0);
+    }
+  */
   public Command reverse() {
     return startEnd(() -> setIntakeSpeed(-1), () -> setIntakeSpeed(0));
   }

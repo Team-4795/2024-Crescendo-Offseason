@@ -22,11 +22,9 @@ public class Pivot extends SubsystemBase {
       case REAL:
       case REPLAY:
         ffModel = new SimpleMotorFeedforward(0.0, 0.0);
-        io.configurePID(1.0, 0.0, 0.0);
         break;
       case SIM:
         ffModel = new SimpleMotorFeedforward(0.0, 0.0);
-        io.configurePID(1.0, 0.0, 0.0);
         break;
       default:
         ffModel = new SimpleMotorFeedforward(0.0, 0.0);
@@ -39,7 +37,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public static Pivot initialize(PivotIO io) {
-    if (Pivot.pivotInstance == null) { 
+    if (Pivot.pivotInstance == null) {
       pivotInstance = new Pivot(io);
     }
     return pivotInstance;

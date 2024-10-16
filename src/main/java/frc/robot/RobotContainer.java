@@ -29,15 +29,11 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
-import frc.robot.subsystems.pivot.Pivot;
-import frc.robot.subsystems.pivot.PivotIOSim;
-import frc.robot.subsystems.flywheel.Flywheel;
-import frc.robot.subsystems.flywheel.FlywheelIO;
-import frc.robot.subsystems.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.pivot.Pivot;
+import frc.robot.subsystems.pivot.PivotIOSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -74,7 +70,6 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3));
         // change perchance
         pivot = Pivot.initialize(new PivotIOSim());
-        flywheel = new Flywheel(new FlywheelIOSparkMax());
         Intake.initialize(new IntakeIOReal());
         // drive = new Drive(
         // new GyroIOPigeon2(),
@@ -95,7 +90,6 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         pivot = Pivot.initialize(new PivotIOSim());
-        flywheel = new Flywheel(new FlywheelIOSim());
         Intake.initialize(new IntakeIOSim());
 
         break;
@@ -166,10 +160,11 @@ public class RobotContainer {
 
     controller
         .y()
-        .whileTrue(Commands.runEnd(() -> pivot.setGoal(Math.PI / 4), () -> pivot.setGoal(0), pivot));
+        .whileTrue(
+            Commands.runEnd(() -> pivot.setGoal(Math.PI / 4), () -> pivot.setGoal(0), pivot));
   }
 
-  /**   
+  /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
