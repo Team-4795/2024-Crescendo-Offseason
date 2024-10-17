@@ -4,78 +4,51 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 public class ShooterIOReal implements ShooterIO {
-  private CANSparkFlex leftShooterMotor =
+  private CANSparkFlex topShooterMotor =
       new CANSparkFlex(0, MotorType.kBrushless); // Can IDs not accurate
-  private CANSparkFlex rightShooterMotor =
+  private CANSparkFlex bottomShooterMotor =
       new CANSparkFlex(1, MotorType.kBrushless); // Can IDsp not accurate
 
-  private RelativeEncoder leftShooterEncoder = leftShooterMotor.getEncoder();
-  private RelativeEncoder rightShooterEncoder = rightShooterMotor.getEncoder();
+  private RelativeEncoder topShooterEncoder = topShooterMotor.getEncoder();
+  private RelativeEncoder bottomShooterEncoder = bottomShooterMotor.getEncoder();
+  private SimpleMotorFeedforward ffmodel = new SimpleMotorFeedforward(0, 0);
 
   public ShooterIOReal() {
-    rightShooterMotor.restoreFactoryDefaults();
-    leftShooterMotor.restoreFactoryDefaults();
+    bottomShooterMotor.restoreFactoryDefaults();
+    topShooterMotor.restoreFactoryDefaults();
 
-    rightShooterMotor.follow(leftShooterMotor, true);
+    bottomShooterMotor.follow(topShooterMotor, true);
 
-    leftShooterMotor.setSmartCurrentLimit(40);
-    rightShooterMotor.setSmartCurrentLimit(40);
+    topShooterMotor.setSmartCurrentLimit(40);
+    bottomShooterMotor.setSmartCurrentLimit(40);
 
-    rightShooterMotor.setIdleMode(IdleMode.kCoast);
-    leftShooterMotor.setIdleMode(IdleMode.kCoast);
+    bottomShooterMotor.setIdleMode(IdleMode.kCoast);
+    topShooterMotor.setIdleMode(IdleMode.kCoast);
 
-    rightShooterMotor.burnFlash();
-    leftShooterMotor.burnFlash();
+    bottomShooterMotor.burnFlash();
+    topShooterMotor.burnFlash();
   }
 
   @Override
-  public void spinForwards() {
-    leftShooterMotor.set(1.0);
+  public void setVoltage(double voltage) {
+    topShooterMotor.setVoltage(voltage);
   }
 
   @Override
-  public void spinBackwards() {
-    leftShooterMotor.set(-1.0);
-  }
-
-  @Override
-  public void stopMotor() {
-    leftShooterMotor.set(0.0);
-  }
-
-  public double getLeftvelocity() {
-    return leftShooterEncoder.getVelocity();
-  }
-
-  public double getRightvelocity() {
-    return rightShooterEncoder.getVelocity();
-  }
-
-  public double getLeftVoltage() {
-    return leftShooterMotor.getBusVoltage();
-  }
-
-  public double getRightVoltage() {
-    return rightShooterMotor.getBusVoltage();
-  }
-
-  public double getLeftCurrent() {
-    return leftShooterMotor.getOutputCurrent();
-  }
-
-  public double getRightCurrent() {
-    return rightShooterMotor.getOutputCurrent();
+  public void setVelocity(double velocity) {
+    topShooterMotor.setVoltage(ffmodel.calculate(velocity));
   }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    inputs.leftMotorVelocity = getLeftvelocity();
-    inputs.rightMotorVelocity = getRightvelocity();
-    inputs.leftAppliedVolts = getLeftVoltage();
-    inputs.rightAppliedVolts = getRightVoltage();
-    inputs.leftOutputCurrent = getLeftCurrent();
-    inputs.rightOutputCurrent = getRightCurrent();
+    inputs.topMotorVelocity = topShooterEncoder.getVelocity();
+    inputs.bottomMotorVelocity = bottomShooterEncoder.getVelocity();
+    inputs.topAppliedVolts = topShooterMotor.getBusVoltage();
+    inputs.bottomAppliedVolts = bottomShooterMotor.getBusVoltage();
+    inputs.topOutputCurrent = topShooterMotor.getOutputCurrent();
+    inputs.bottomOutputCurrent = bottomShooterMotor.getOutputCurrent();
   }
 }
