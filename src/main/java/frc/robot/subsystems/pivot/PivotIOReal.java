@@ -8,9 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
 public class PivotIOReal implements PivotIO {
-  private CANSparkFlex pivotLeft = new CANSparkFlex(10, MotorType.kBrushless);
-  private CANSparkFlex pivotRight = new CANSparkFlex(11, MotorType.kBrushless);
-  private RelativeEncoder pivotEncoderRight = pivotRight.getEncoder();
+  private CANSparkFlex pivotMotor = new CANSparkFlex(11, MotorType.kBrushless);
+  private RelativeEncoder pivotEncoderRight = pivotMotor.getEncoder();
   private PIDController pid = new PIDController(1.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
@@ -18,23 +17,14 @@ public class PivotIOReal implements PivotIO {
   private double appliedVolts = 0.0;
 
   public PivotIOReal() {
-    pivotLeft.restoreFactoryDefaults();
-    pivotRight.restoreFactoryDefaults();
+    pivotMotor.restoreFactoryDefaults();
 
-    pivotLeft.follow(pivotRight);
-    pivotLeft.setInverted(true);
+    pivotMotor.setCANTimeout(250);
+    pivotMotor.enableVoltageCompensation(12);
+    pivotMotor.setSmartCurrentLimit(80);
+    pivotMotor.setIdleMode(IdleMode.kBrake);
 
-    pivotLeft.setCANTimeout(250);
-    pivotRight.setCANTimeout(250);
-    pivotLeft.enableVoltageCompensation(12);
-    pivotRight.enableVoltageCompensation(12);
-    pivotLeft.setSmartCurrentLimit(80);
-    pivotRight.setSmartCurrentLimit(80);
-    pivotLeft.setIdleMode(IdleMode.kBrake);
-    pivotRight.setIdleMode(IdleMode.kBrake);
-
-    pivotLeft.burnFlash();
-    pivotRight.burnFlash();
+    pivotMotor.burnFlash();
   }
 
   @Override
@@ -57,6 +47,6 @@ public class PivotIOReal implements PivotIO {
   @Override
   public void setVoltage(double volts) {
     appliedVolts = MathUtil.clamp(volts, -12, 12);
-    pivotRight.setVoltage(appliedVolts);
+    pivotMotor.setVoltage(appliedVolts);
   }
 }
