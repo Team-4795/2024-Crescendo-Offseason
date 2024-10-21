@@ -62,13 +62,13 @@ public class ModuleIOTalonFX implements ModuleIO {
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 1:
-        driveTalonFX = new TalonFX(3);
-        turnSparkMax = new CANSparkFlex(4, MotorType.kBrushless);
+        driveTalonFX = new TalonFX(10);
+        turnSparkMax = new CANSparkFlex(9, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 2:
-        driveTalonFX = new TalonFX(5);
+        driveTalonFX = new TalonFX(4);
         turnSparkMax = new CANSparkFlex(6, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED

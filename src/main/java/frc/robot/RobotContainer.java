@@ -62,10 +62,10 @@ public class RobotContainer {
         drive =
             Drive.initialize(
                 new GyroIONavX(),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
 
         // new Drive(
         //     new GyroIOPigeon2(),
