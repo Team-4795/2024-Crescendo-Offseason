@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -158,11 +159,17 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller
-        .y()
-        .whileTrue(
-            Commands.runEnd(() -> pivot.setGoal(Math.PI / 4), () -> pivot.setGoal(0), pivot));
+    // controller
+    //     .leftBumper()
+    //     .onTrue(
+    //         Commands.runOnce(() -> pivot.setGoal(Math.PI / 6), pivot));
+    // controller
+    //     .rightBumper()
+    //     .onTrue(
+    //         Commands.runOnce(() -> pivot.setGoal(0), pivot));
+
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

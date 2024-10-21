@@ -1,8 +1,12 @@
 package frc.robot.subsystems.pivot;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.intake.Intake;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends SubsystemBase {
@@ -30,6 +34,9 @@ public class Pivot extends SubsystemBase {
         ffModel = new SimpleMotorFeedforward(0.0, 0.0);
         break;
     }
+
+    setDefaultCommand(Pivot.getInstance().currDetPivot());
+
   }
 
   public static Pivot getInstance() {
@@ -41,6 +48,15 @@ public class Pivot extends SubsystemBase {
       pivotInstance = new Pivot(io);
     }
     return pivotInstance;
+  }
+
+  public Command currDetPivot() {
+    return Commands.sequence(
+      Commands.waitUntil(() -> Intake.getInstance().noteNotInIntake()),
+      Commands.runOnce(() -> Pivot.getInstance().setGoal(Math.PI / 6)),
+      Commands.waitUntil(() -> !Intake.getInstance().noteNotInIntake()),
+      Commands.runOnce(() -> Pivot.getInstance().setGoal(0))
+    );
   }
 
   @Override
