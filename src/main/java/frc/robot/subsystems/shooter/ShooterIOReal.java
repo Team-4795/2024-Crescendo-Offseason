@@ -8,9 +8,9 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 public class ShooterIOReal implements ShooterIO {
   private CANSparkFlex topShooterMotor =
-      new CANSparkFlex(0, MotorType.kBrushless); // Can IDs not accurate
+      new CANSparkFlex(12, MotorType.kBrushless); // Can IDs not accurate
   private CANSparkFlex bottomShooterMotor =
-      new CANSparkFlex(1, MotorType.kBrushless); // Can IDsp not accurate
+      new CANSparkFlex(3, MotorType.kBrushless); // Can IDsp not accurate
 
   private RelativeEncoder topShooterEncoder = topShooterMotor.getEncoder();
   private RelativeEncoder bottomShooterEncoder = bottomShooterMotor.getEncoder();
