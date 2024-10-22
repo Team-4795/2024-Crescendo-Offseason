@@ -30,16 +30,23 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.util.LocalADStarAK;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+  private static Drive instance;
   private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
   private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
@@ -49,8 +56,13 @@ public class Drive extends SubsystemBase {
 
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
+  private final MutableMeasure<Voltage> m_appliedVoltage = MutableMeasure.ofBaseUnits(0, Volts);
+  private final MutableMeasure<Angle> m_position = MutableMeasure.ofBaseUnits(0, Radians);
+  private final MutableMeasure<Velocity<Angle>> m_velocity =
+      MutableMeasure.ofBaseUnits(0, RadiansPerSecond);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -61,8 +73,20 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
+
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
+  public static Drive getInstance() {
+    return instance;
+  }
+
+  public static Drive initialize(GyroIO gyro, ModuleIO fl, ModuleIO fr, ModuleIO bl, ModuleIO br) {
+    if (instance == null) {
+      instance = new Drive(gyro, fl, fr, bl, br);
+    }
+    return instance;
+  }
 
   public Drive(
       GyroIO gyroIO,
@@ -102,18 +126,20 @@ public class Drive extends SubsystemBase {
     // Configure SysId
     sysId =
         new SysIdRoutine(
-            new SysIdRoutine.Config(
-                null,
-                null,
-                null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+            new SysIdRoutine.Config(),
             new SysIdRoutine.Mechanism(
                 (voltage) -> {
                   for (int i = 0; i < 4; i++) {
                     modules[i].runCharacterization(voltage.in(Volts));
                   }
                 },
-                null,
+                log -> {
+                  log.motor("driveSparkMax")
+                      .voltage(m_appliedVoltage.mut_replace(inputs.driveAppliedVolts, Volts))
+                      .angularPosition(m_position.mut_replace(inputs.drivePositionRad, Radians))
+                      .angularVelocity(
+                          m_velocity.mut_replace(inputs.driveVelocityRadPerSec, RadiansPerSecond));
+                },
                 this));
   }
 
@@ -201,6 +227,22 @@ public class Drive extends SubsystemBase {
     }
     kinematics.resetHeadings(headings);
     stop();
+  }
+
+  public void zeroHeading() {
+    if (Constants.currentMode == Mode.SIM) {
+      poseEstimator.resetPosition(
+          new Rotation2d(),
+          new SwerveModulePosition[] {
+            modules[0].getPosition(),
+            modules[1].getPosition(),
+            modules[2].getPosition(),
+            modules[3].getPosition()
+          },
+          getPose());
+    }
+
+    gyroIO.reset();
   }
 
   /** Returns a command to run a quasistatic test in the specified direction. */
