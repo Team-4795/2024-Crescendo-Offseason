@@ -51,7 +51,6 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final AbsoluteEncoder turnAbsoluteEncoder;
 
   private final boolean isTurnMotorInverted = true;
-  private final Rotation2d absoluteEncoderOffset;
 
   public ModuleIOTalonFX(int index) {
     switch (index) {
@@ -60,28 +59,26 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveTalonFX = new TalonFX(1);
         turnSparkMax = new CANSparkFlex(2, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        driveTalonFX.setInverted(false);
         break;
       case 1:
         // Front right
         driveTalonFX = new TalonFX(10);
         turnSparkMax = new CANSparkFlex(9, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 2:
         // Back left
         driveTalonFX = new TalonFX(4);
         turnSparkMax = new CANSparkFlex(6, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        driveTalonFX.setInverted(false);
         break;
       case 3:
         // Back right
         driveTalonFX = new TalonFX(7);
         turnSparkMax = new CANSparkFlex(8, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       default:
         throw new RuntimeException("Invalid module index");
@@ -91,7 +88,6 @@ public class ModuleIOTalonFX implements ModuleIO {
 
     turnAbsoluteEncoder.setPositionConversionFactor(2 * Math.PI); // Radians
     turnAbsoluteEncoder.setVelocityConversionFactor((2 * Math.PI) / 60.0); // Radians per second
-    // turnAbsoluteEncoder.setZeroOffset(absoluteEncoderOffset.getRadians());
 
     turnSparkMax.setCANTimeout(250);
 
@@ -102,6 +98,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnSparkMax.enableVoltageCompensation(12.0);
 
     driveTalonFX.setPosition(0);
+    driveTalonFX.setInverted(true);
 
     turnRelativeEncoder.setPosition(0.0);
     turnRelativeEncoder.setMeasurementPeriod(10);

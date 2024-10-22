@@ -14,8 +14,8 @@ public class GyroIONavX implements GyroIO {
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = gyro.isConnected();
-    inputs.yawPosition = gyro.getRotation2d().times(-1);
-    inputs.yawVelocityRadPerSec = -Units.degreesToRadians(gyro.getRate());
+    inputs.yawPosition = gyro.getRotation2d();
+    inputs.yawVelocityRadPerSec = Units.degreesToRadians(gyro.getRate());
   }
 
   @Override
