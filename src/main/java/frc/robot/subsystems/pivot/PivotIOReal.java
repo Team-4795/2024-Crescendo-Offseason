@@ -22,7 +22,7 @@ public class PivotIOReal implements PivotIO {
 
     pivotMotor.setCANTimeout(250);
     pivotMotor.enableVoltageCompensation(12);
-    pivotMotor.setSmartCurrentLimit(80);
+    pivotMotor.setSmartCurrentLimit(30);
     pivotMotor.setIdleMode(IdleMode.kBrake);
 
     pivotMotor.burnFlash();
