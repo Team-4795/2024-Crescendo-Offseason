@@ -27,7 +27,7 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
@@ -185,7 +185,7 @@ public class RobotContainer {
     //         Commands.startEnd(
     //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
 
-    // controller.a().whileTrue(Commands.runOnce(() -> drive.zeroHeading(), drive));
+    controller.a().whileTrue(Commands.runOnce(() -> drive.zeroHeading(), drive));
   }
 
   /**

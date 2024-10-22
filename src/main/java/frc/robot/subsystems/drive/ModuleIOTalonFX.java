@@ -41,8 +41,8 @@ import edu.wpi.first.math.util.Units;
 public class ModuleIOTalonFX implements ModuleIO {
   final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
   // Gear ratios for SDS MK4i L2, adjust as necessary
-  private static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-  private static final double TURN_GEAR_RATIO = 150.0 / 7.0;
+  private static final double DRIVE_GEAR_RATIO = 5.46;
+  private static final double TURN_GEAR_RATIO = 11.3142;
 
   private final TalonFX driveTalonFX;
   private final CANSparkFlex turnSparkMax;
@@ -56,24 +56,28 @@ public class ModuleIOTalonFX implements ModuleIO {
   public ModuleIOTalonFX(int index) {
     switch (index) {
       case 0:
+        // Front left
         driveTalonFX = new TalonFX(1);
         turnSparkMax = new CANSparkFlex(2, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 1:
+        // Front right
         driveTalonFX = new TalonFX(10);
         turnSparkMax = new CANSparkFlex(9, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 2:
+        // Back left
         driveTalonFX = new TalonFX(4);
         turnSparkMax = new CANSparkFlex(6, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 3:
+        // Back right
         driveTalonFX = new TalonFX(7);
         turnSparkMax = new CANSparkFlex(8, MotorType.kBrushless);
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder();
@@ -87,6 +91,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
     turnAbsoluteEncoder.setPositionConversionFactor(2 * Math.PI); // Radians
     turnAbsoluteEncoder.setVelocityConversionFactor((2 * Math.PI) / 60.0); // Radians per second
+    // turnAbsoluteEncoder.setZeroOffset(absoluteEncoderOffset.getRadians());
 
     turnSparkMax.setCANTimeout(250);
 
