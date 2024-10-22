@@ -2,6 +2,7 @@ package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -50,8 +51,8 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intake() {
-    return startEnd(() -> setIntakeSpeed(1), () -> setIntakeSpeed(0))
-        .onlyWhile(() -> noteNotInIntake());
+    return Commands.startEnd(() -> io.setMotorSpeed(1), () -> io.setMotorSpeed(0));
+    // .onlyWhile(() -> noteNotInIntake());
     // return (startEnd(() -> setIntakeSpeed(1), () -> setIntakeSpeed(0)).onlyWhile(() ->
     // noteNotInIntake())).alongWith(startEnd(() -> setIntakeSpeed(0.1), () ->
     // setIntakeSpeed(0)).onlyIf(() -> noteNotInIntake() == true).onlyWhile(() -> noteNotInIntake()
@@ -63,7 +64,7 @@ public class Intake extends SubsystemBase {
     }
   */
   public Command reverse() {
-    return startEnd(() -> setIntakeSpeed(-1), () -> setIntakeSpeed(0));
+    return startEnd(() -> io.setMotorSpeed(-1), () -> io.setMotorSpeed(0));
   }
 
   @Override

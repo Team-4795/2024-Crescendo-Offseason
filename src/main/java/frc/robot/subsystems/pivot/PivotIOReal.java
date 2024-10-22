@@ -11,6 +11,7 @@ public class PivotIOReal implements PivotIO {
   private CANSparkFlex pivotMotor = new CANSparkFlex(11, MotorType.kBrushless);
   private RelativeEncoder pivotEncoderRight = pivotMotor.getEncoder();
   private PIDController pid = new PIDController(1.0, 0.0, 0.0);
+  private double gearing = 36;
 
   private boolean closedLoop = false;
   private double ffVolts = 0.0;
@@ -29,8 +30,8 @@ public class PivotIOReal implements PivotIO {
 
   @Override
   public void updateInputs(PivotIOInputs inputs) {
-    inputs.positionRad = pivotEncoderRight.getPosition() * 2 * Math.PI;
-    inputs.velocityRadPerSec = pivotEncoderRight.getVelocity() * 2 * Math.PI / 60;
+    inputs.positionRad = (pivotEncoderRight.getPosition() * 2 * Math.PI) / gearing;
+    inputs.velocityRadPerSec = (pivotEncoderRight.getVelocity() * 2 * Math.PI / 60) / gearing;
     inputs.appliedVolts = appliedVolts;
     inputs.goalAngle = pid.getSetpoint();
 

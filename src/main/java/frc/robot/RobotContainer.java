@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -29,12 +28,14 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.pivot.Pivot;
+import frc.robot.subsystems.pivot.PivotIO;
+import frc.robot.subsystems.pivot.PivotIOReal;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -45,6 +46,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Intake intake;
   private final Pivot pivot;
 
   // Controller
@@ -52,8 +54,6 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
-  private final LoggedDashboardNumber flywheelSpeedInput =
-      new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -67,13 +67,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(1),
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
-        // drive = new Drive(
-        // new GyroIOPigeon2(),
-        // new ModuleIOTalonFX(0),
-        // new ModuleIOTalonFX(1),
-        // new ModuleIOTalonFX(2),
-        // new ModuleIOTalonFX(3));
-        // flywheel = new Flywheel(new FlywheelIOTalonFX());
+        intake = Intake.initialize(new IntakeIOReal());
+        pivot = Pivot.initialize(new PivotIOReal());
         break;
 
       case SIM:
@@ -85,8 +80,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
+        intake = Intake.initialize(new IntakeIOSim());
         pivot = Pivot.initialize(new PivotIOSim());
-        Intake.initialize(new IntakeIOSim());
 
         break;
 
@@ -99,19 +94,12 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        intake = Intake.initialize(new IntakeIO() {});
+        pivot = Pivot.initialize(new PivotIO() {});
         // change?
-        pivot = Pivot.initialize(new PivotIOSim());
         break;
     }
 
-    // This can go away
-
-    // Set up auto routines
-    // NamedCommands.registerCommand(
-    //     "Run Flywheel",
-    //     Commands.startEnd(
-    //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel)
-    //         .withTimeout(5.0));
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
@@ -125,19 +113,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    // autoChooser.addOption(
-    //     "Flywheel SysId (Quasistatic Forward)",
-    //     flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Flywheel SysId (Quasistatic Reverse)",
-    //     flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Flywheel SysId (Dynamic Forward)",
-    // flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Flywheel SysId (Dynamic Reverse)",
-    // flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -157,34 +132,26 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller.rightBumper()
+      .onTrue(Commands.run(() -> intake.setIntakeSpeed(0.75)))
+      .onFalse(Commands.run(() -> intake.setIntakeSpeed(0)));
 
-    controller.leftBumper().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-
-    controller.leftTrigger().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-
-    controller.rightBumper().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-
-    controller.rightTrigger().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    controller.leftBumper()
+      .onTrue(Commands.run(() -> intake.setIntakeSpeed(-0.75)))
+      .onFalse(Commands.run(() -> intake.setIntakeSpeed(0)));
 
     // controller
-    //     .b()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () ->
-    //                     drive.setPose(
-    //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-    //                 drive)
-    //             .ignoringDisable(true));
+    //     .leftBumper()
+    //     .whileTrue(Commands.startEnd(() -> pivot.runVoltage(3), () -> pivot.runVoltage(0),
+    // pivot));
+
     // controller
-    //     .a()
-    //     .whileTrue(
-    //         Commands.startEnd(
-    //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
+    //     .rightBumper()
+    //     .whileTrue(Commands.startEnd(() -> pivot.runVoltage(-3), () -> pivot.runVoltage(0),
+    // pivot));
 
     controller.a().whileTrue(Commands.runOnce(() -> drive.zeroHeading(), drive));
   }
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
