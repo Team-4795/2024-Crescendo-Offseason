@@ -1,14 +1,14 @@
 package frc.robot.subsystems.pivot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
 public class PivotIOReal implements PivotIO {
-  private CANSparkFlex pivotMotor = new CANSparkFlex(11, MotorType.kBrushless);
+  private CANSparkMax pivotMotor = new CANSparkMax(11, MotorType.kBrushless);
   private RelativeEncoder pivotEncoderRight = pivotMotor.getEncoder();
   private PIDController pid = new PIDController(1.0, 0.0, 0.0);
   private double gearing = 36;

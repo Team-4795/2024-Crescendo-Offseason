@@ -1,14 +1,14 @@
 package frc.robot.subsystems.shooter;
 
-import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 public class ShooterIOReal implements ShooterIO {
-  private CANSparkFlex leftShooterMotor =
-      new CANSparkFlex(3, MotorType.kBrushless); // Can IDs not accurate
-  private CANSparkFlex rightShooterMotor =
-      new CANSparkFlex(12, MotorType.kBrushless); // Can IDs not accurate
+  private CANSparkMax leftShooterMotor =
+      new CANSparkMax(3, MotorType.kBrushless); // Can IDs not accurate
+  private CANSparkMax rightShooterMotor =
+      new CANSparkMax(12, MotorType.kBrushless); // Can IDs not accurate
   private RelativeEncoder leftShooterEncoder = leftShooterMotor.getEncoder();
   private RelativeEncoder rightShooterEncoder = rightShooterMotor.getEncoder();
 
