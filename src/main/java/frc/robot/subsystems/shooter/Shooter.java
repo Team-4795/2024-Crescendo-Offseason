@@ -24,6 +24,10 @@ public class Shooter extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
+  public void setVoltage(double voltage) {
+    io.setVoltage(voltage);
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);

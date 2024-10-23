@@ -35,6 +35,8 @@ import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIO;
 import frc.robot.subsystems.pivot.PivotIOReal;
 import frc.robot.subsystems.pivot.PivotIOSim;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIOReal;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -48,6 +50,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Intake intake;
   private final Pivot pivot;
+  private final Shooter shooter;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -69,6 +72,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(3));
         intake = Intake.initialize(new IntakeIOReal());
         pivot = Pivot.initialize(new PivotIOReal());
+        shooter = Shooter.initialize(new ShooterIOReal());
         break;
 
       case SIM:
@@ -82,7 +86,7 @@ public class RobotContainer {
                 new ModuleIOSim());
         intake = Intake.initialize(new IntakeIOSim());
         pivot = Pivot.initialize(new PivotIOSim());
-
+        shooter = Shooter.initialize(new ShooterIOReal());
         break;
 
       default:
@@ -96,6 +100,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         intake = Intake.initialize(new IntakeIO() {});
         pivot = Pivot.initialize(new PivotIO() {});
+        shooter = Shooter.initialize(new ShooterIOReal());
         // change?
         break;
     }
@@ -132,23 +137,33 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    controller.rightBumper()
-      .onTrue(Commands.run(() -> intake.setIntakeSpeed(0.75)))
-      .onFalse(Commands.run(() -> intake.setIntakeSpeed(0)));
+    controller
+        .rightTrigger()
+        .onTrue(Commands.run(() -> intake.setIntakeSpeed(0.75)))
+        .onFalse(Commands.run(() -> intake.setIntakeSpeed(0)));
 
-    controller.leftBumper()
-      .onTrue(Commands.run(() -> intake.setIntakeSpeed(-0.75)))
-      .onFalse(Commands.run(() -> intake.setIntakeSpeed(0)));
+    controller
+        .leftTrigger()
+        .onTrue(Commands.run(() -> intake.setIntakeSpeed(-0.75)))
+        .onFalse(Commands.run(() -> intake.setIntakeSpeed(0)));
 
-    // controller
-    //     .leftBumper()
-    //     .whileTrue(Commands.startEnd(() -> pivot.runVoltage(3), () -> pivot.runVoltage(0),
-    // pivot));
+    controller
+        .leftBumper()
+        .whileTrue(Commands.startEnd(() -> pivot.runVoltage(3), () -> pivot.runVoltage(0), pivot));
+    controller
+        .povUp()
+        .whileTrue(
+            Commands.startEnd(() -> shooter.setVoltage(6), () -> shooter.setVoltage(0), pivot));
+    // controller.leftBumper()
+    //   .onTrue(Commands.runOnce(() -> pivot.runVoltage(3)))
+    //   .onFalse(Commands.runOnce(() ->pivot.runVoltage(0), pivot));
+    // controller.rightBumper()
+    //   .onTrue(Commands.runOnce(() -> pivot.runVoltage(3)))
+    //   .onFalse(Commands.runOnce(() ->pivot.runVoltage(0), pivot));
 
-    // controller
-    //     .rightBumper()
-    //     .whileTrue(Commands.startEnd(() -> pivot.runVoltage(-3), () -> pivot.runVoltage(0),
-    // pivot));
+    controller
+        .rightBumper()
+        .whileTrue(Commands.startEnd(() -> pivot.runVoltage(-3), () -> pivot.runVoltage(0), pivot));
 
     controller.a().whileTrue(Commands.runOnce(() -> drive.zeroHeading(), drive));
   }

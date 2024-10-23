@@ -6,14 +6,19 @@ import com.revrobotics.RelativeEncoder;
 
 public class ShooterIOReal implements ShooterIO {
   private CANSparkFlex leftShooterMotor =
-      new CANSparkFlex(0, MotorType.kBrushless); // Can IDs not accurate
+      new CANSparkFlex(3, MotorType.kBrushless); // Can IDs not accurate
   private CANSparkFlex rightShooterMotor =
-      new CANSparkFlex(1, MotorType.kBrushless); // Can IDs not accurate
+      new CANSparkFlex(12, MotorType.kBrushless); // Can IDs not accurate
   private RelativeEncoder leftShooterEncoder = leftShooterMotor.getEncoder();
   private RelativeEncoder rightShooterEncoder = rightShooterMotor.getEncoder();
 
   public ShooterIOReal() {
-    rightShooterMotor.follow(leftShooterMotor, true);
+    rightShooterMotor.restoreFactoryDefaults();
+    leftShooterMotor.restoreFactoryDefaults();
+    leftShooterMotor.follow(rightShooterMotor, true);
+
+    rightShooterMotor.setSmartCurrentLimit(40);
+    leftShooterMotor.setSmartCurrentLimit(40);
 
     rightShooterMotor.burnFlash();
     leftShooterMotor.burnFlash();
@@ -21,12 +26,17 @@ public class ShooterIOReal implements ShooterIO {
 
   @Override
   public void spinForwards() {
-    leftShooterMotor.set(1.0);
+    rightShooterMotor.set(1.0);
+  }
+
+  @Override
+  public void setVoltage(double voltage) {
+    rightShooterMotor.setVoltage(voltage);
   }
 
   @Override
   public void spinBackwards() {
-    leftShooterMotor.set(-1.0);
+    rightShooterMotor.set(-1.0);
   }
 
   public double getLeftvelocity() {
