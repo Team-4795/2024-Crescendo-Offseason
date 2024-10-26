@@ -1,7 +1,7 @@
 package frc.robot.subsystems.shooter;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 
 public class ShooterIOReal implements ShooterIO {
@@ -15,7 +15,7 @@ public class ShooterIOReal implements ShooterIO {
   public ShooterIOReal() {
     rightShooterMotor.restoreFactoryDefaults();
     leftShooterMotor.restoreFactoryDefaults();
-    leftShooterMotor.follow(rightShooterMotor, true);
+    leftShooterMotor.setInverted(false);
 
     rightShooterMotor.setSmartCurrentLimit(40);
     leftShooterMotor.setSmartCurrentLimit(40);
@@ -32,6 +32,17 @@ public class ShooterIOReal implements ShooterIO {
   @Override
   public void setVoltage(double voltage) {
     rightShooterMotor.setVoltage(voltage);
+    leftShooterMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public void setRightVoltage(double voltage) {
+    rightShooterMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public void setLeftVoltage(double voltage) {
+    leftShooterMotor.setVoltage(voltage);
   }
 
   @Override

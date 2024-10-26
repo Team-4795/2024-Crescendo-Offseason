@@ -1,8 +1,8 @@
 package frc.robot.subsystems.pivot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;

@@ -54,6 +54,7 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController controller1 = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -137,33 +138,62 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    controller
+    controller1
         .rightTrigger()
-        .onTrue(Commands.run(() -> intake.setIntakeSpeed(0.75)))
-        .onFalse(Commands.run(() -> intake.setIntakeSpeed(0)));
+        .whileTrue(
+            Commands.startEnd(() -> intake.setIntakeSpeed(0.75), () -> intake.setIntakeSpeed(0)));
 
-    controller
+    controller1
         .leftTrigger()
-        .onTrue(Commands.run(() -> intake.setIntakeSpeed(-0.75)))
-        .onFalse(Commands.run(() -> intake.setIntakeSpeed(0)));
+        .whileTrue(
+            Commands.startEnd(() -> intake.setIntakeSpeed(-0.75), () -> intake.setIntakeSpeed(0)));
 
-    controller
+    controller1
         .leftBumper()
         .whileTrue(Commands.startEnd(() -> pivot.runVoltage(3), () -> pivot.runVoltage(0), pivot));
-    controller
-        .povUp()
-        .whileTrue(
-            Commands.startEnd(() -> shooter.setVoltage(6), () -> shooter.setVoltage(0), pivot));
-    // controller.leftBumper()
-    //   .onTrue(Commands.runOnce(() -> pivot.runVoltage(3)))
-    //   .onFalse(Commands.runOnce(() ->pivot.runVoltage(0), pivot));
-    // controller.rightBumper()
-    //   .onTrue(Commands.runOnce(() -> pivot.runVoltage(3)))
-    //   .onFalse(Commands.runOnce(() ->pivot.runVoltage(0), pivot));
 
-    controller
+    controller1
         .rightBumper()
         .whileTrue(Commands.startEnd(() -> pivot.runVoltage(-3), () -> pivot.runVoltage(0), pivot));
+
+    // Shoot sequence
+    controller
+        .leftTrigger()
+        .onTrue(
+            Commands.race(
+                Commands.startEnd(
+                    () -> shooter.setLeftRightVoltage(11, 2), () -> shooter.setVoltage(0)),
+                Commands.sequence(
+                    Commands.waitSeconds(2),
+                    Commands.startEnd(
+                            () -> intake.setIntakeSpeed(0.75), () -> intake.setIntakeSpeed(0))
+                        .withTimeout(1))));
+
+    // controller
+    //     .povLeft()
+    //     .onTrue(
+    //         Commands.sequence(
+    //             Commands.startEnd(() -> pivot.runVoltage(3), () -> pivot.runVoltage(0), pivot)
+    //                 .withTimeout(1),
+    //             Commands.race(
+    //                 Commands.startEnd(() -> shooter.setVoltage(9), () -> shooter.setVoltage(0)),
+    //                 Commands.sequence(
+    //                     Commands.waitSeconds(3),
+    //                     Commands.startEnd(
+    //                             () -> intake.setIntakeSpeed(-0.75), () ->
+    // intake.setIntakeSpeed(0))
+    //                         .withTimeout(3)))));
+
+    controller
+        .povDown()
+        .whileTrue(
+            Commands.startEnd(() -> shooter.setVoltage(-9), () -> shooter.setVoltage(0), pivot));
+
+    controller
+        .povRight()
+        .whileTrue(
+            Commands.startEnd(
+                () -> shooter.setLeftRightVoltage(11, 2), () -> shooter.setLeftRightVoltage(0, 0)));
 
     controller.a().whileTrue(Commands.runOnce(() -> drive.zeroHeading(), drive));
   }
