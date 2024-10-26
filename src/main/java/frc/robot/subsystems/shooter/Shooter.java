@@ -28,6 +28,13 @@ public class Shooter extends SubsystemBase {
     io.setVoltage(voltage);
   }
 
+  public void changeVoltage(double dv) {
+    setLeftRightVoltage(
+      inputs.leftVoltage >= 1 + dv ? inputs.leftVoltage + dv : 0, 
+      inputs.rightVoltage >= 1 + dv ? inputs.rightVoltage + dv : 0
+    );
+  }
+ 
   public void setLeftRightVoltage(double leftVoltage, double rightVoltage) {
     io.setRightVoltage(rightVoltage);
     io.setLeftVoltage(leftVoltage);

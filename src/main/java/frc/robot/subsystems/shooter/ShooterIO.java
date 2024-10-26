@@ -7,6 +7,8 @@ public interface ShooterIO {
   public static class ShooterIOInputs {
     public double leftMotorVelocity = 0.0;
     public double rightMotorVelocity = 0.0;
+    public double leftVoltage = 0.0;
+    public double rightVoltage = 0.0;
   }
 
   public default void spinForwards() {}

@@ -185,9 +185,21 @@ public class RobotContainer {
     //                         .withTimeout(3)))));
 
     controller
-        .povDown()
+        .povLeft()
         .whileTrue(
             Commands.startEnd(() -> shooter.setVoltage(-9), () -> shooter.setVoltage(0), pivot));
+
+    controller
+        .povUp()
+        .onTrue(
+          Commands.startEnd(() -> shooter.changeVoltage(1), () -> shooter.setVoltage(1))
+        );
+
+  controller
+    .povUp()
+    .onTrue(
+      Commands.startEnd(() -> shooter.changeVoltage(-1), () -> shooter.setVoltage(-1))
+    );
 
     controller
         .povRight()

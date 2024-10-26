@@ -62,5 +62,7 @@ public class ShooterIOReal implements ShooterIO {
   public void updateInputs(ShooterIOInputs inputs) {
     inputs.leftMotorVelocity = getLeftvelocity();
     inputs.rightMotorVelocity = getRightvelocity();
+    inputs.leftVoltage = leftShooterMotor.getBusVoltage();
+    inputs.leftVoltage = rightShooterMotor.getBusVoltage();
   }
 }
