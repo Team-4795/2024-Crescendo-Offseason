@@ -151,6 +151,16 @@ public class RobotContainer {
     controller1
         .leftBumper()
         .whileTrue(Commands.startEnd(() -> pivot.runVoltage(3), () -> pivot.runVoltage(0), pivot));
+    controller
+        .povUp()
+        .whileTrue(
+            Commands.startEnd(() -> shooter.setVoltage(3), () -> shooter.setVoltage(0), pivot));
+    // controller.leftBumper()
+    //   .onTrue(Commands.runOnce(() -> pivot.runVoltage(3)))
+    //   .onFalse(Commands.runOnce(() ->pivot.runVoltage(0), pivot));
+    // controller.rightBumper()
+    //   .onTrue(Commands.runOnce(() -> pivot.runVoltage(3)))
+    //   .onFalse(Commands.runOnce(() ->pivot.runVoltage(0), pivot));
 
     controller1
         .rightBumper()
@@ -162,7 +172,7 @@ public class RobotContainer {
         .onTrue(
             Commands.race(
                 Commands.startEnd(
-                    () -> shooter.setLeftRightVoltage(11, 2), () -> shooter.setVoltage(0)),
+                    () -> shooter.setLeftRightVoltage(5, 1), () -> shooter.setVoltage(0)),
                 Commands.sequence(
                     Commands.waitSeconds(2),
                     Commands.startEnd(
@@ -187,7 +197,7 @@ public class RobotContainer {
     controller
         .povLeft()
         .whileTrue(
-            Commands.startEnd(() -> shooter.setVoltage(-9), () -> shooter.setVoltage(0), pivot));
+            Commands.startEnd(() -> shooter.setVoltage(-4), () -> shooter.setVoltage(0), pivot));
 
     controller
         .povUp()
