@@ -14,9 +14,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,16 +23,21 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
-import frc.robot.subsystems.flywheel.Flywheel;
-import frc.robot.subsystems.flywheel.FlywheelIO;
-import frc.robot.subsystems.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOReal;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.pivot.Pivot;
+import frc.robot.subsystems.pivot.PivotIO;
+import frc.robot.subsystems.pivot.PivotIOReal;
+import frc.robot.subsystems.pivot.PivotIOSim;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIOReal;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -46,15 +48,16 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Flywheel flywheel;
+  private final Intake intake;
+  private final Pivot pivot;
+  private final Shooter shooter;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController controller1 = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
-  private final LoggedDashboardNumber flywheelSpeedInput =
-      new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -63,19 +66,14 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
-        flywheel = new Flywheel(new FlywheelIOSparkMax());
-        // drive = new Drive(
-        // new GyroIOPigeon2(),
-        // new ModuleIOTalonFX(0),
-        // new ModuleIOTalonFX(1),
-        // new ModuleIOTalonFX(2),
-        // new ModuleIOTalonFX(3));
-        // flywheel = new Flywheel(new FlywheelIOTalonFX());
+                new GyroIONavX(),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
+        intake = Intake.initialize(new IntakeIOReal());
+        pivot = Pivot.initialize(new PivotIOReal());
+        shooter = Shooter.initialize(new ShooterIOReal());
         break;
 
       case SIM:
@@ -87,7 +85,9 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
-        flywheel = new Flywheel(new FlywheelIOSim());
+        intake = Intake.initialize(new IntakeIOSim());
+        pivot = Pivot.initialize(new PivotIOSim());
+        shooter = Shooter.initialize(new ShooterIOReal());
         break;
 
       default:
@@ -99,16 +99,13 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        flywheel = new Flywheel(new FlywheelIO() {});
+        intake = Intake.initialize(new IntakeIO() {});
+        pivot = Pivot.initialize(new PivotIO() {});
+        shooter = Shooter.initialize(new ShooterIOReal());
+        // change?
         break;
     }
 
-    // Set up auto routines
-    NamedCommands.registerCommand(
-        "Run Flywheel",
-        Commands.startEnd(
-                () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel)
-            .withTimeout(5.0));
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
@@ -122,16 +119,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Flywheel SysId (Quasistatic Forward)",
-        flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Flywheel SysId (Quasistatic Reverse)",
-        flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Flywheel SysId (Dynamic Forward)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -150,21 +137,87 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+    controller1
+        .rightTrigger()
+        .whileTrue(
+            Commands.startEnd(() -> intake.setIntakeSpeed(0.75), () -> intake.setIntakeSpeed(0)));
+
+    controller1
+        .leftTrigger()
+        .whileTrue(
+            Commands.startEnd(() -> intake.setIntakeSpeed(-0.75), () -> intake.setIntakeSpeed(0)));
+
+    controller1
+        .leftBumper()
+        .whileTrue(Commands.startEnd(() -> pivot.runVoltage(3), () -> pivot.runVoltage(0), pivot));
     controller
-        .b()
+        .povUp()
+        .whileTrue(
+            Commands.startEnd(() -> shooter.setVoltage(3), () -> shooter.setVoltage(0), pivot));
+    // controller.leftBumper()
+    //   .onTrue(Commands.runOnce(() -> pivot.runVoltage(3)))
+    //   .onFalse(Commands.runOnce(() ->pivot.runVoltage(0), pivot));
+    // controller.rightBumper()
+    //   .onTrue(Commands.runOnce(() -> pivot.runVoltage(3)))
+    //   .onFalse(Commands.runOnce(() ->pivot.runVoltage(0), pivot));
+
+    controller1
+        .rightBumper()
+        .whileTrue(Commands.startEnd(() -> pivot.runVoltage(-3), () -> pivot.runVoltage(0), pivot));
+
+    // Shoot sequence
+    controller
+        .leftTrigger()
         .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+            Commands.race(
+                Commands.startEnd(
+                    () -> shooter.setLeftRightVoltage(5, 1), () -> shooter.setVoltage(0)),
+                Commands.sequence(
+                    Commands.waitSeconds(2),
+                    Commands.startEnd(
+                            () -> intake.setIntakeSpeed(0.75), () -> intake.setIntakeSpeed(0))
+                        .withTimeout(1))));
+
+    // controller
+    //     .povLeft()
+    //     .onTrue(
+    //         Commands.sequence(
+    //             Commands.startEnd(() -> pivot.runVoltage(3), () -> pivot.runVoltage(0), pivot)
+    //                 .withTimeout(1),
+    //             Commands.race(
+    //                 Commands.startEnd(() -> shooter.setVoltage(9), () -> shooter.setVoltage(0)),
+    //                 Commands.sequence(
+    //                     Commands.waitSeconds(3),
+    //                     Commands.startEnd(
+    //                             () -> intake.setIntakeSpeed(-0.75), () ->
+    // intake.setIntakeSpeed(0))
+    //                         .withTimeout(3)))));
+
     controller
-        .a()
+        .povLeft()
+        .whileTrue(
+            Commands.startEnd(() -> shooter.setVoltage(-4), () -> shooter.setVoltage(0), pivot));
+
+    controller
+        .povUp()
+        .onTrue(
+          Commands.startEnd(() -> shooter.changeVoltage(1), () -> shooter.setVoltage(1))
+        );
+
+  controller
+    .povUp()
+    .onTrue(
+      Commands.startEnd(() -> shooter.changeVoltage(-1), () -> shooter.setVoltage(-1))
+    );
+
+    controller
+        .povRight()
         .whileTrue(
             Commands.startEnd(
-                () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
+                () -> shooter.setLeftRightVoltage(11, 2), () -> shooter.setLeftRightVoltage(0, 0)));
+
+    controller.a().whileTrue(Commands.runOnce(() -> drive.zeroHeading(), drive));
   }
 
   /**

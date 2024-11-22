@@ -37,6 +37,8 @@ public interface ModuleIO {
   /** Run the drive motor at the specified voltage. */
   public default void setDriveVoltage(double volts) {}
 
+  public default void runTalonPID(double desiredStateRotPerSecond) {}
+
   /** Run the turn motor at the specified voltage. */
   public default void setTurnVoltage(double volts) {}
 
